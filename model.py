@@ -6,47 +6,49 @@ from langchain_core.prompts import ChatPromptTemplate
 from constants import SYSTEM_PROMPT
 from pydantic_classes import HumanDetector, ThiefDetector
 from utils import retrieve_current_image, retrieve_sequence_images
-
+from langchain_community.callbacks import get_openai_callback
 
 load_dotenv()
 
-model = ChatOpenAI(model="gpt-4o", temperature = 0)
+with get_openai_callback() as cb:
 
-human_prompt_template = ChatPromptTemplate.from_messages([
-    ("system", SYSTEM_PROMPT + '{pydantic_instruction}'),
-    HumanMessage(
-        content=retrieve_current_image()
-    )
-    ]
-)
-thief_prompt_template = ChatPromptTemplate.from_messages([
-    ("system", SYSTEM_PROMPT + '{pydantic_instruction}'),
-    HumanMessage(
-        content=retrieve_sequence_images()
+    model = ChatOpenAI(model="gpt-4o", temperature = 0)
+
+    human_prompt_template = ChatPromptTemplate.from_messages([
+        ("system", SYSTEM_PROMPT + '{pydantic_instruction}'),
+        HumanMessage(
+            content=retrieve_current_image()
         )
-    ]
-)
+        ]
+    )
+    thief_prompt_template = ChatPromptTemplate.from_messages([
+        ("system", SYSTEM_PROMPT + '{pydantic_instruction}'),
+        HumanMessage(
+            content=retrieve_sequence_images()
+            )
+        ]
+    )
 
 
-parser = PydanticOutputParser(pydantic_object=HumanDetector)
-pydantic_instructions = parser.get_format_instructions()
-human_detection_chain = human_prompt_template | model | parser
-
-human_result = human_detection_chain.invoke({
-                    'pydantic_instruction': pydantic_instructions
-                    })
-
-if human_result.is_human:
-    parser = PydanticOutputParser(pydantic_object=ThiefDetector)
+    parser = PydanticOutputParser(pydantic_object=HumanDetector)
     pydantic_instructions = parser.get_format_instructions()
-    thief_detection_chain = thief_prompt_template | model | parser
-    thief_result = thief_detection_chain.invoke({ 
+    human_detection_chain = human_prompt_template | model | parser
+
+    human_result = human_detection_chain.invoke({
                         'pydantic_instruction': pydantic_instructions
                         })
-    
-print(human_result)
 
-print(thief_result)
+    if human_result.is_human:
+        parser = PydanticOutputParser(pydantic_object=ThiefDetector)
+        pydantic_instructions = parser.get_format_instructions()
+        thief_detection_chain = thief_prompt_template | model | parser
+        thief_result = thief_detection_chain.invoke({ 
+                            'pydantic_instruction': pydantic_instructions
+                            })
+        
+    print(human_result)
 
+    print(thief_result)
 
+    print("The total cost of the process was " + str(cb.total_cost) + ' USD')
 
