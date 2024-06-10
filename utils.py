@@ -11,6 +11,13 @@ def retrieve_current_image():
     output =  [{"type": "image_url","image_url": {"url": f"data:image/jpeg;base64,{encoding_img('current_log.jpg')}"}}]
     return output
 
+def turn_on_alarm():
+    return "Alarm Turned On"
+
+def call_police():
+    return "Police notified"
+
+
 def retrieve_sequence_past_images():
     images = ['current_log.jpg','historical_log_1.jpg','historical_log_2.jpg','historical_log_3.jpg']
     output = [{"type":"text","text":"Make your analysis based on this sequence of images."}]
