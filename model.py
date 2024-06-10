@@ -4,7 +4,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from constants import SYSTEM_PROMPT
 from pydantic_classes import HumanDetector, ThiefDetector, ModelCompany
-from utils import retrieve_current_image, retrieve_sequence_images
+from utils import retrieve_current_image, retrieve_sequence_past_images
 from langchain_community.callbacks import get_openai_callback
 from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -45,7 +45,7 @@ class Detector:
         prompt_template = ChatPromptTemplate.from_messages([
             ("system", SYSTEM_PROMPT + '{pydantic_instruction}'),
             HumanMessage(
-                content=retrieve_sequence_images()
+                content=retrieve_sequence_past_images()
                 )
             ]
         )
