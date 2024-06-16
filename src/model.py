@@ -1,11 +1,19 @@
+import os
+from dotenv import load_dotenv
+import sys
+
+load_dotenv()
+WORKDIR=os.getenv("WORKDIR")
+os.chdir(WORKDIR)
+sys.path.append(WORKDIR)
+
 from langchain_core.output_parsers import PydanticOutputParser
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from constants import SYSTEM_PROMPT
 from pydantic_classes import HumanDetector, ThiefDetector, ModelCompany
-from utils import retrieve_current_image, retrieve_sequence_past_images
-from langchain_community.callbacks import get_openai_callback
+from src.utils import retrieve_current_image, retrieve_sequence_past_images
 from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 

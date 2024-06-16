@@ -1,3 +1,12 @@
+import os
+from dotenv import load_dotenv
+import sys
+
+load_dotenv()
+WORKDIR=os.getenv("WORKDIR")
+os.chdir(WORKDIR)
+sys.path.append(WORKDIR)
+
 import base64
 
 
@@ -8,7 +17,7 @@ def encoding_img(path):
     return image_data
 
 def retrieve_current_image():
-    output =  [{"type": "image_url","image_url": {"url": f"data:image/jpeg;base64,{encoding_img('current_log.jpg')}"}}]
+    output =  [{"type": "image_url","image_url": {"url": f"data:image/jpeg;base64,{encoding_img(f'{WORKDIR}/images/current_log.jpg')}"}}]
     return output
 
 def turn_on_alarm():
@@ -17,12 +26,11 @@ def turn_on_alarm():
 def call_police():
     return "Police notified"
 
-
 def retrieve_sequence_past_images():
     images = ['current_log.jpg','historical_log_1.jpg','historical_log_2.jpg','historical_log_3.jpg']
     output = [{"type":"text","text":"Make your analysis based on this sequence of images."}]
 
     for image in images:
-        output.append({"type": "image_url", "image_url":{"url":f"data:image/jpg;base64,{encoding_img(image)}"}})
+        output.append({"type": "image_url", "image_url":{"url":f"data:image/jpg;base64,{encoding_img(WORKDIR+'/images/'+image)}"}})
 
     return output
