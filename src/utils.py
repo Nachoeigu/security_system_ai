@@ -8,6 +8,18 @@ os.chdir(WORKDIR)
 sys.path.append(WORKDIR)
 
 import base64
+from pathlib import Path
+import time
+
+def get_timestamped_filename(original_filename: str) -> str:
+    timestamp = int(time.time())
+    ext = original_filename.split(".")[-1]
+    return f"{timestamp}.{ext}"
+
+def cleanup_old_files(directory: Path, max_files: int):
+    files = sorted(directory.iterdir(), key=os.path.getmtime, reverse=True)
+    for file in files[max_files:]:
+        file.unlink()
 
 
 def encoding_img(path):
