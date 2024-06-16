@@ -12,15 +12,17 @@ import time
 from src.utils import call_police, turn_on_alarm
 
 if __name__ == '__main__':
-    app = Detector(mode = 'google')
+    app = Detector(mode = 'openai')
 
     while True:
         time.sleep(2)
+        print("Starting...")
         human_result = app.analyzing_human_detection()
         if human_result.is_human:
             thief_result = app.analyzing_thief_detection()
             if thief_result.is_thief:
-                turn_on_alarm()
-                call_police()
+                print(turn_on_alarm())
+                print(call_police())
+                break
         
     
