@@ -9,16 +9,23 @@ sys.path.append(WORKDIR)
 
 from src.model import Detector
 from src.utils import capture_screenshots
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 
 if __name__ == '__main__':
+    model = ChatOpenAI(model="gpt-4o", temperature = 0)
+    #model = ChatGoogleGenerativeAI(model="gemini-1.5-pro")
+    
+
+
     output_folder = 'images'
-    detector = Detector(mode='openai')
+    detector = Detector(model)
     user_input = int(input("Are you testing with: \n 1) local video\n 2) streaming camera\n"))
     if user_input == 1:
-        video_path = 'video_testing.mov' 
+        video_path = 'video_testing_3.mov' 
         capture_screenshots(source=video_path, 
                             output_folder=output_folder, 
-                            interval_seconds=2, 
+                            interval_seconds=3, 
                             streaming=False,
                             detector=detector)
     else:

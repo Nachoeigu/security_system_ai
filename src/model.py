@@ -9,10 +9,8 @@ sys.path.append(WORKDIR)
 
 from langchain_core.output_parsers import PydanticOutputParser
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
 from src.pydantic_classes import HumanDetector, ThiefDetector, ModelCompany
 from src.utils import retrieve_current_image, retrieve_sequence_past_images, create_prompt_human_detector, create_prompt_thief_detector
-from langchain_google_genai import ChatGoogleGenerativeAI
 
 
 load_dotenv()
@@ -20,12 +18,8 @@ load_dotenv()
 
 class Detector:
 
-    def __init__(self, mode: ModelCompany):
-        if mode == 'openai':
-            self.model = ChatOpenAI(model="gpt-4o", temperature = 0)
-        elif mode == 'google':
-            self.model = ChatGoogleGenerativeAI(model="gemini-1.5-pro")
-
+    def __init__(self, model):
+        self.model = model
         self.human_parser = PydanticOutputParser(pydantic_object=HumanDetector)
         self.thief_parser = PydanticOutputParser(pydantic_object=ThiefDetector)
         self.human_parser_instructions = self.human_parser.get_format_instructions()

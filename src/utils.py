@@ -23,13 +23,15 @@ import time
 def analyzing_image(detector) -> bool:
     human_evaluation = detector.analyzing_human_detection()
     if human_evaluation.is_human:
-        print("Human detected, analyzing if it is a robbery")
+        print("Human detected, analyzing if it is a robbery...")
         thief_evaluation = detector.analyzing_thief_detection()
         if thief_evaluation.is_thief:
+            print("Someone is trying to enter and steal...")
             print(turn_on_alarm())
             print(call_police())
             return True
         else:
+            print("No criminal intension...")
             return False
     else:
         print("No human present")
@@ -83,10 +85,10 @@ def capture_screenshots(detector:'Detector', source:str='', output_folder:str='i
 
             minutes = int(video_time_sec // 60)
             seconds = int(video_time_sec % 60)
-            print(f"Screenshot taken at {minutes} minute(s) and {seconds} second(s)")
             print("Analyzing if there is a human in the screenshot")
 
             if analyzing_image(detector):
+                print(f"The moment when it was detected was {minutes} minute(s) and {seconds} second(s)")
                 break
 
             start_time = time.time()  # Reset start time after analysis
