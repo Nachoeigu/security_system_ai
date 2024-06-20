@@ -9,7 +9,99 @@ sys.path.append(WORKDIR)
 
 import base64
 from pathlib import Path
+from langchain.tools import tool
+from typing import List, Dict, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.model import Detector
+
+from langchain_core.messages import HumanMessage, SystemMessage
+from constants import SYSTEM_PROMPT_FOR_HUMAN_DETECTION, SYSTEM_PROMPT_FOR_THIEF_DETECTION
+import cv2
 import time
+
+def analyzing_image(detector) -> bool:
+    human_evaluation = detector.analyzing_human_detection()
+    if human_evaluation.is_human:
+        print("Human detected, analyzing if it is a robbery")
+        thief_evaluation = detector.analyzing_thief_detection()
+        if thief_evaluation.is_thief:
+            print(turn_on_alarm())
+            print(call_police())
+            return True
+        else:
+            return False
+    else:
+        print("No human present")
+        return False
+
+def checking_if_directory_exist(output_folder):
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+def opening_video(streaming, source):
+    if streaming:
+        cap = cv2.VideoCapture(0)  # Open the default camera
+    else:
+        cap = cv2.VideoCapture(source)
+
+    if not cap.isOpened():
+        raise Exception(f"Unable to open video source {source}")
+
+    return cap
+
+def capture_screenshots(detector:'Detector', source:str='', output_folder:str='images', interval_seconds:int=3, streaming:bool=False):
+    checking_if_directory_exist(output_folder=output_folder)
+    cap = opening_video(streaming=streaming, source=source)
+
+    screenshots = []
+    start_time = time.time()
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            if not streaming:
+                break
+            else:
+                continue
+
+        current_time = time.time()
+        elapsed_time = current_time - start_time
+
+        # Capture a frame every interval_seconds
+        if elapsed_time >= interval_seconds:
+            current_timestamp = int(current_time)  # Use current_time instead of time.time()
+            image_path = os.path.join(output_folder, f"{current_timestamp}.jpg")
+            cv2.imwrite(image_path, frame)
+            screenshots.append(image_path)
+            
+            if streaming:
+                video_time_sec = elapsed_time
+            else:
+                video_time_msec = cap.get(cv2.CAP_PROP_POS_MSEC)
+                video_time_sec = video_time_msec / 1000
+
+            minutes = int(video_time_sec // 60)
+            seconds = int(video_time_sec % 60)
+            print(f"Screenshot taken at {minutes} minute(s) and {seconds} second(s)")
+            print("Analyzing if there is a human in the screenshot")
+
+            if analyzing_image(detector):
+                break
+
+            start_time = time.time()  # Reset start time after analysis
+
+            # Keep only the last 4 screenshots
+            if len(screenshots) > 4:
+                oldest_screenshot = screenshots.pop(0)
+                if os.path.exists(oldest_screenshot):
+                    os.remove(oldest_screenshot)
+
+        # Sleep for a short duration to prevent high CPU usage
+        time.sleep(0.01)
+
+    cap.release()
+
 
 def get_timestamped_filename(original_filename: str) -> str:
     timestamp = int(time.time())
@@ -49,3 +141,36 @@ def retrieve_sequence_past_images():
         output.append({"type": "image_url", "image_url":{"url":f"data:image/jpg;base64,{encoding_img(image_path)}"}})
 
     return output
+
+@tool
+def create_prompt_human_detector(pydantic_instruction:str, current_image:List[Dict]):
+    """
+    This function creates the prompt with two inputs parameters:
+    - pydantic_instruction: How the LLM should structure the output
+    - current_image: A formated list so the LLM can read the image
+    """
+    return  [
+        SystemMessage(
+            content = SYSTEM_PROMPT_FOR_HUMAN_DETECTION + f"{pydantic_instruction}"
+        ),
+        HumanMessage(
+            content=current_image
+        )
+    ]
+
+@tool
+def create_prompt_thief_detector(pydantic_instruction:str, sequence_images:List[Dict]):
+    """
+    This function creates the prompt with two inputs parameters:
+    - pydantic_instruction: How the LLM should structure the output
+    - sequence_images: A formated list so the LLM can read the sequence of images
+    """
+    return  [
+        SystemMessage(
+            content = SYSTEM_PROMPT_FOR_THIEF_DETECTION + f"{pydantic_instruction}"
+        ),
+        HumanMessage(
+            content=sequence_images
+        )
+    ]
+
