@@ -125,7 +125,7 @@ def encoding_img(path):
 def retrieve_current_image(resolution:str):
     path_last_shot = sorted(Path(f'{WORKDIR}/images').glob('*.jpg'), key=lambda x: int(x.stem), reverse=True)[0]
     past_last_shot = '/'.join(path_last_shot.parts)[1:]
-    output =  [{"type": "image_url","image_url": {"url": f"data:image/jpeg;base64,{encoding_img(past_last_shot)}", "detail": f"{resolution}"}}]
+    output =  [{"type": "image_url","image_url": {"url": f"data:image/jpeg;base64,{encoding_img(past_last_shot)}", "details": f"{resolution}"}}]
     return output
 
 def turn_on_alarm():

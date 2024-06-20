@@ -13,9 +13,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 
 if __name__ == '__main__':
-    #model = ChatOpenAI(model="gpt-4o", 
-    #                   temperature = 0)
-    model = ChatGoogleGenerativeAI(model="gemini-1.5-pro")
+    model = ChatOpenAI(model="gpt-4o", 
+                       temperature = 0)
+    #model = ChatGoogleGenerativeAI(model="gemini-1.5-pro")
     
 
 
