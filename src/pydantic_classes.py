@@ -17,8 +17,8 @@ class ThiefDetector(BaseModel):
 class HumanDetector(BaseModel):
     is_human: bool = Field(..., description = 'It defines if there is someone in the frame')
 
-class ModelCompany(BaseModel):
-    my_param: Literal['openai', 'google']
-
 class ModelFunction(BaseModel):
     my_param: Literal['human_detector', 'thief_detector']
+
+class AllowedResolution(BaseModel):
+    resolution: Literal['high', 'low'] = Field(..., description = "The resolution of the provided images to the LLM")

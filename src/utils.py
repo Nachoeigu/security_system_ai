@@ -122,10 +122,10 @@ def encoding_img(path):
 
     return image_data
 
-def retrieve_current_image():
+def retrieve_current_image(resolution:str):
     path_last_shot = sorted(Path(f'{WORKDIR}/images').glob('*.jpg'), key=lambda x: int(x.stem), reverse=True)[0]
     past_last_shot = '/'.join(path_last_shot.parts)[1:]
-    output =  [{"type": "image_url","image_url": {"url": f"data:image/jpeg;base64,{encoding_img(past_last_shot)}"}}]
+    output =  [{"type": "image_url","image_url": {"url": f"data:image/jpeg;base64,{encoding_img(past_last_shot)}", "detail": f"{resolution}"}}]
     return output
 
 def turn_on_alarm():
@@ -134,13 +134,13 @@ def turn_on_alarm():
 def call_police():
     return "Police notified"
 
-def retrieve_sequence_past_images():
+def retrieve_sequence_past_images(resolution:str):
     images = sorted(Path(f"{WORKDIR}/images").glob('*.jpg'), key=lambda x: int(x.stem), reverse=True)[:4]
     output = [{"type":"text","text":"Make your analysis based on this sequence of images"}]
 
     for image in images:
         image_path = '/'.join(image.parts)[1:]
-        output.append({"type": "image_url", "image_url":{"url":f"data:image/jpg;base64,{encoding_img(image_path)}"}})
+        output.append({"type": "image_url", "image_url":{"url":f"data:image/jpg;base64,{encoding_img(image_path)}", "details": f"{resolution}"}})
 
     return output
 

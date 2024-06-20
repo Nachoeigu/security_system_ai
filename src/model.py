@@ -9,17 +9,17 @@ sys.path.append(WORKDIR)
 
 from langchain_core.output_parsers import PydanticOutputParser
 from dotenv import load_dotenv
-from src.pydantic_classes import HumanDetector, ThiefDetector, ModelCompany
+from src.pydantic_classes import HumanDetector, ThiefDetector, AllowedResolution
 from src.utils import retrieve_current_image, retrieve_sequence_past_images, create_prompt_human_detector, create_prompt_thief_detector
-
 
 load_dotenv()
 
 
 class Detector:
 
-    def __init__(self, model):
+    def __init__(self, model, resolution:AllowedResolution):
         self.model = model
+        self.resolution = AllowedResolution(resolution = resolution)
         self.human_parser = PydanticOutputParser(pydantic_object=HumanDetector)
         self.thief_parser = PydanticOutputParser(pydantic_object=ThiefDetector)
         self.human_parser_instructions = self.human_parser.get_format_instructions()
@@ -33,7 +33,7 @@ class Detector:
     def analyzing_human_detection(self):
         return self.human_detection_chain.invoke({
                             'pydantic_instruction': self.human_parser_instructions,
-                            'current_image':retrieve_current_image()
+                            'current_image':retrieve_current_image(self.resolution)
                             })
  
     def __creating_thief_detection_chain(self):
@@ -42,7 +42,7 @@ class Detector:
     def analyzing_thief_detection(self):
         return self.thief_detection_chain.invoke({ 
                             'pydantic_instruction': self.thief_parser_instructions,
-                            'sequence_images':retrieve_sequence_past_images()
+                            'sequence_images':retrieve_sequence_past_images(self.resolution)
                             })
      
 
