@@ -28,7 +28,7 @@ def analyzing_image(detector) -> bool:
         if thief_evaluation.is_thief:
             print("Someone is trying to enter and steal...")
             print(turn_on_alarm())
-            print(call_police())
+            print(call_police(thief_evaluation.description))
             return True
         else:
             print("No criminal intension...")
@@ -87,9 +87,9 @@ def capture_screenshots(detector:'Detector', source:str='', output_folder:str='i
             seconds = int(video_time_sec % 60)
             print("Analyzing if there is a human in the screenshot")
 
-            if analyzing_image(detector):
-                print(f"The moment when it was detected was {minutes} minute(s) and {seconds} second(s)")
-                break
+            #if analyzing_image(detector):
+            #    print(f"The moment when it was detected was {minutes} minute(s) and {seconds} second(s)")
+            #    break
 
             start_time = time.time()  # Reset start time after analysis
 
@@ -131,8 +131,9 @@ def retrieve_current_image(resolution:str):
 def turn_on_alarm():
     return "Alarm Turned On"
 
-def call_police():
-    return "Police notified"
+def call_police(message:str) -> str:
+    return f"Police notified with the following description:\n{message}"
+
 
 def retrieve_sequence_past_images(resolution:str):
     images = sorted(Path(f"{WORKDIR}/images").glob('*.jpg'), key=lambda x: int(x.stem), reverse=True)[:4]
