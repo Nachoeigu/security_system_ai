@@ -37,7 +37,9 @@ class Detector:
                             })
  
     def __creating_thief_detection_chain(self):
-        self.thief_detection_chain = create_prompt_thief_detector | self.model | self.thief_parser
+        self.thief_detection_chain = create_prompt_thief_detector \
+                                        | self.model \
+                                        | self.thief_parser
          
     def analyzing_thief_detection(self):
         return self.thief_detection_chain.invoke({ 
