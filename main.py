@@ -16,8 +16,6 @@ if __name__ == '__main__':
     model = ChatOpenAI(model="gpt-4o", 
                        temperature = 0)
     #model = ChatGoogleGenerativeAI(model="gemini-1.5-pro")
-    
-
 
     output_folder = 'images'
     detector = Detector(model=model, resolution='low')
