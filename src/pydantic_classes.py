@@ -13,7 +13,7 @@ from typing import Literal
 
 class ThiefDetector(BaseModel):
     is_thief: bool = Field(..., description = 'It defines if there are someone entering in the property with bad intensions')
-    description: str = Field(..., description = 'If is_thief = False, return "". Otherwise, describe what is going on in order to report the police about the incident')
+    description: str = Field(..., description = 'If is_thief = False, return "". Otherwise, describe the sequence to report the police about the incident')
 
 class HumanDetector(BaseModel):
     is_human: bool = Field(..., description = 'It defines if there is someone in the frame')

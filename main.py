@@ -21,7 +21,7 @@ if __name__ == '__main__':
     detector = Detector(model=model, resolution='low')
     user_input = int(input("Are you testing with: \n 1) downloaded video\n 2) streaming camera\n"))
     if user_input == 1:
-        video_path = 'video_testing_3.mov' 
+        video_path = 'video_testing.mov' 
         capture_screenshots(source=video_path, 
                             output_folder=output_folder, 
                             interval_seconds=1, 

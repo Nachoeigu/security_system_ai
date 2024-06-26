@@ -127,7 +127,7 @@ def call_police(message:str) -> str:
 
 
 def retrieve_sequence_past_images(resolution:str):
-    images = sorted(Path(f"{WORKDIR}/images").glob('*.jpg'), key=lambda x: int(x.stem), reverse=True)[:4]
+    images = sorted(Path(f"{WORKDIR}/images").glob('*.jpg'), key=lambda x: int(x.stem))[:4]
     output = [{"type":"text","text":"Make your analysis based on this sequence of images"}]
 
     for image in images:
