@@ -22,7 +22,6 @@ import time
 
 def analyzing_image(detector) -> bool:
     return detector.chain.invoke({
-        'pydantic_instruction': detector.human_parser_instructions,
         'current_image':retrieve_current_image(detector.resolution)
         })
 
@@ -137,15 +136,14 @@ def retrieve_sequence_past_images(resolution:str):
     return output
 
 @tool
-def create_prompt_human_detector(pydantic_instruction:str, current_image:List[Dict]):
+def create_prompt_human_detector(current_image:List[Dict]):
     """
-    This function creates the prompt with two inputs parameters:
-    - pydantic_instruction: How the LLM should structure the output
+    This function creates the prompt with this input:
     - current_image: A formated list so the LLM can read the image
     """
     return  [
         SystemMessage(
-            content = SYSTEM_PROMPT_FOR_HUMAN_DETECTION + f"{pydantic_instruction}"
+            content = SYSTEM_PROMPT_FOR_HUMAN_DETECTION
         ),
         HumanMessage(
             content=current_image
@@ -153,15 +151,14 @@ def create_prompt_human_detector(pydantic_instruction:str, current_image:List[Di
     ]
 
 @tool
-def create_prompt_thief_detector(pydantic_instruction:str, sequence_images:List[Dict]):
+def create_prompt_thief_detector(sequence_images:List[Dict]):
     """
-    This function creates the prompt with two inputs parameters:
-    - pydantic_instruction: How the LLM should structure the output
+    This function creates the prompt with this input:
     - sequence_images: A formated list so the LLM can read the sequence of images
     """
     return  [
         SystemMessage(
-            content = SYSTEM_PROMPT_FOR_THIEF_DETECTION + f"{pydantic_instruction}"
+            content = SYSTEM_PROMPT_FOR_THIEF_DETECTION
         ),
         HumanMessage(
             content=sequence_images

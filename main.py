@@ -24,7 +24,7 @@ if __name__ == '__main__':
         video_path = 'video_testing.mov' 
         capture_screenshots(source=video_path, 
                             output_folder=output_folder, 
-                            interval_seconds=1, 
+                            interval_seconds=1.8, 
                             streaming=False,
                             detector=detector)
     else:
