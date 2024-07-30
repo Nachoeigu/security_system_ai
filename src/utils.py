@@ -21,21 +21,10 @@ import cv2
 import time
 
 def analyzing_image(detector) -> bool:
-    human_evaluation = detector.analyzing_human_detection()
-    if human_evaluation.is_human:
-        print("Human detected, analyzing if it is a robbery...")
-        thief_evaluation = detector.analyzing_thief_detection()
-        if thief_evaluation.is_thief:
-            print("Someone is trying to enter and steal...")
-            print(turn_on_alarm())
-            print(call_police(thief_evaluation.description))
-            return True
-        else:
-            print("No criminal intension...")
-            return False
-    else:
-        print("No human present")
-        return False
+    return detector.chain.invoke({
+        'current_image':retrieve_current_image(detector.resolution)
+        })
+
 
 def checking_if_directory_exist(output_folder):
     if not os.path.exists(output_folder):
@@ -87,9 +76,10 @@ def capture_screenshots(detector:'Detector', source:str='', output_folder:str='i
             seconds = int(video_time_sec % 60)
             print("Analyzing if there is a human in the screenshot")
 
-            #if analyzing_image(detector):
-            #    print(f"The moment when it was detected was {minutes} minute(s) and {seconds} second(s)")
-            #    break
+            result_of_analysis = analyzing_image(detector)
+            if result_of_analysis['output']['is_thief']:
+                print(f"The moment when it was detected was {minutes} minute(s) and {seconds} second(s)")
+                break
 
             start_time = time.time()  # Reset start time after analysis
 
@@ -136,7 +126,7 @@ def call_police(message:str) -> str:
 
 
 def retrieve_sequence_past_images(resolution:str):
-    images = sorted(Path(f"{WORKDIR}/images").glob('*.jpg'), key=lambda x: int(x.stem), reverse=True)[:4]
+    images = sorted(Path(f"{WORKDIR}/images").glob('*.jpg'), key=lambda x: int(x.stem))[:4]
     output = [{"type":"text","text":"Make your analysis based on this sequence of images"}]
 
     for image in images:
@@ -146,15 +136,14 @@ def retrieve_sequence_past_images(resolution:str):
     return output
 
 @tool
-def create_prompt_human_detector(pydantic_instruction:str, current_image:List[Dict]):
+def create_prompt_human_detector(current_image:List[Dict]):
     """
-    This function creates the prompt with two inputs parameters:
-    - pydantic_instruction: How the LLM should structure the output
+    This function creates the prompt with this input:
     - current_image: A formated list so the LLM can read the image
     """
     return  [
         SystemMessage(
-            content = SYSTEM_PROMPT_FOR_HUMAN_DETECTION + f"{pydantic_instruction}"
+            content = SYSTEM_PROMPT_FOR_HUMAN_DETECTION
         ),
         HumanMessage(
             content=current_image
@@ -162,15 +151,14 @@ def create_prompt_human_detector(pydantic_instruction:str, current_image:List[Di
     ]
 
 @tool
-def create_prompt_thief_detector(pydantic_instruction:str, sequence_images:List[Dict]):
+def create_prompt_thief_detector(sequence_images:List[Dict]):
     """
-    This function creates the prompt with two inputs parameters:
-    - pydantic_instruction: How the LLM should structure the output
+    This function creates the prompt with this input:
     - sequence_images: A formated list so the LLM can read the sequence of images
     """
     return  [
         SystemMessage(
-            content = SYSTEM_PROMPT_FOR_THIEF_DETECTION + f"{pydantic_instruction}"
+            content = SYSTEM_PROMPT_FOR_THIEF_DETECTION
         ),
         HumanMessage(
             content=sequence_images
